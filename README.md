@@ -1,5 +1,5 @@
-#Rowing Capstone
+# Rowing Capstone
 
-##Integrated Software
+## Integrated Software
 
-##Website
+## Website
