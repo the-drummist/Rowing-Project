@@ -5,10 +5,12 @@ from bokeh.embed import file_html
 from bokeh.models import ColumnDataSource, BoxAnnotation, NumeralTickFormatter
 from bokeh.layouts import column
 class Data:
-	def __init__(self, emgfile, vitalsfile, age, weight, gender):
+	def __init__(self, emgfile, vitalsfile, age, weight, gender, rhr):
 		"""
 		Construct the Data class, parse the files into lists
 		"""
+		# resting heart rate
+		self.rhr = rhr
 		self.age = age
 		# convert weight to kilograms
 		self.weight = weight * 0.453592
@@ -29,12 +31,12 @@ class Data:
 		with open(vitalsfile, mode='r') as vitals:
 			# list comprehension to form the lists with ONLY valid data
 			self.hr_data = {
-				'y_values': [row['hr'] if row['hr_valid'] is True for row in DictReader(vitals)]
-				'x_values': [[row['time'] if row['hr_valid'] is True for row in DictReader(vitals)]]
+				'y_values': [row['hr'] for row in DictReader(vitals) if row['hr_valid'] is True]
+				'x_values': [row['time'] for row in DictReader(vitals) if row['hr_valid'] is True]
 				}
 			self.spo2_data = {
-				'y_values': [row['spo2'] if row['spo2_valid'] is True for row in DictReader(vitals)]
-				'x_values': [[row['time'] if row['spo2_valid'] is True for row in DictReader(vitals)]]
+				'y_values': [row['spo2'] for row in DictReader(vitals) if row['spo2_valid'] is True]
+				'x_values': [row['time'] for row in DictReader(vitals) if row['spo2_valid'] is True]
 			}
 			self.hr_avg = hr_avg / len(hr)
 
@@ -75,7 +77,26 @@ class Data:
 		"""
 		calculate the intensity of the workout over time and graph it
 		"""
-		pass
+		# iterate through the list of heart rate values in the heart rate dictionary and convert it into MET's
+		inensity_list = [(15.3 * (mhr / self.rhr) / 3.5) for mhr in self.hr_data['y_values']]
+		# convert it into a dict to pass as a data source
+		intensity_data = {
+			'y_values': intensity__list,
+			'x_values': self.hr_data['y_values']
+			}
+		source = ColumnDataSource(intensity_data)
+		curdoc().theme = 'dark_minimal'
+		plot = figure(title='Workout Intensity', x_axis_label='Workout Duration', y_axis_label='METs', toolbar_location='right')
+		# add colors
+		low_box = BoxAnnotation(top=6, fill_alpha=0.1, fill_color='red')
+		mid_box = BoxAnnotation(bottom=6, top=12, fill_alpha=0.1, color='green')
+		high_box = BoxAnnotation(bottom=6, fill_alpha=0.1, color='red')
+		plot.add_layout(low_box)
+		plot.add_layout(mid_box)
+		plot.add_layout(high_box)
+		# draw line
+		plot.line(x='x_values', y='y_values', sorce=source)
+		return plot
 
 
 	def emg_graph(self):
@@ -143,5 +164,6 @@ class Data:
 		spot_plot = spo2_graph()
 		emg_plot = emg_graph()
 		intensity_plot = intensity_graph()
-		shear_plot = shear_load_graph()
-		return calories, file_html(column(hr_plot, spo2_plot, emg_plot, intensity_plot, shear_plot, sizing_mode='scale_width'))
+		#shear_plot = shear_load_graph()
+		# re add shear plot to the return statement when it is working!
+		return calories, file_html(column(hr_plot, spo2_plot, emg_plot, intensity_plot, sizing_mode='scale_width'))

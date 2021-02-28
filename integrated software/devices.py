@@ -1,18 +1,34 @@
 from __future__ import print_function
 from time import sleep
-
+import numpy as np
+import scipy as sp
+from scipy import signal
 import RPi.GPIO as GPIO
 import smbus
-
+import board
+import adafruit_mcp3xxx.mcp3008 as MCP
+import adafruit_mcp3xxx.analogIn
+import digitalio
+import busio
 
 # class for the EMG sensor
+BASELINE = None
 class EMG:
 	# construct the class with the connected pin
-	def __init__(self, pin):
-		self.pin = pin
-		GPIO.cleanup(self.pin)
-		GPIO.setmode(GPIO.BOARD)
-		GPIO.setup(self.pin, GPIO.IN)
+	def __init__(self, pin=MCP.P0):
+		#self.pin = pin
+		#GPIO.cleanup(self.pin)
+		#GPIO.setmode(GPIO.BOARD)
+		#GPIO.setup(self.pin, GPIO.IN)
+		# create filter params (high-pass and low-pass)
+		high = high_band / (sampling_frequency / 2)
+		low = low_band / (sampling_frequency / 2)
+		# create butterworth filter: returns filter coefficients
+		self.b, self.a = sp.signal.butter(4, [high, low], btype='bandpass')
+		spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
+		cs = digitalio.DigitalInOut(board.D5)
+		mcp = MCP.MCP3008(spi, cs)
+		self.pin = AnalogIn(mcp, pin)
 
 	# calibrate the EMG
 	# this will only be necessary if different users get wildly different values 
@@ -20,8 +36,25 @@ class EMG:
 		pass
 
 	# get the current value from the EMG
-	def get_value(self):
-		return GPIO.input(self.pin)
+	def get_raw(self):
+		return self.pin.value
+
+	# read the emg to a buffer and return it to be normalized
+	def read_sequential(self, amount=100):
+		emg_buf = []
+		for i in range(amount):
+			emg_buf.append(get_raw())
+		return np.array(emg_buf)
+
+	def get_normalized(self):
+		buf = read_sequential()
+
+		# filter data (linear filter)
+		emg_filtered = sp.signal.filtfilt(self.b, self.a, emg_data)
+		# rectiy the filtered data
+		emg = abs(emg_filtered) / BASELINE
+
+
 
 ### credit for the following section: https://github.com/vrano714/max30102-tutorial-raspberrypi/blob/master/max30102.py ###
 # this code is currently for python 2.7

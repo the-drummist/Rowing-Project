@@ -30,7 +30,7 @@ def collect_emg(emg, tester):
 		time.clock() 
 		# collect and write data to the csv file
 		while True:
-			emg_val = emg.get_value()
+			emg_val = emg.get_raw()
 			elapsed = time.time() - start
 			writer.writerow({'emg_reading': emg_val, 'time': elapsed})
 
