@@ -2,6 +2,7 @@
 from devices import MAX30102, EMG
 import csv
 from multiprocessing import Process
+import time
 
 def setup(emg_pin, pulse_pin):
 	"""
@@ -9,41 +10,52 @@ def setup(emg_pin, pulse_pin):
 	"""
 	vitals = MAX30102(pulse_pin)
 	emg = EMG(emg_pin)
+	tester = input('name of tester: ')
 	# emg.calibrate()
-	return emg, vitals
+	return emg, vitals, tester
 
-def collect_emg(emg):
+def collect_emg(emg, tester):
 	"""
 	collect the data from the emg sensor and store it in a csv file
 	"""
+	tester += '_emg.csv'
 	# open the emg log (csv format) to start data collection
-	with open('emg.csv', 'a') as emglog:
+	with open(tester, mode='a') as emglog:
 		# set the column header
-		fieldnames = ['emg_reading']
+		fieldnames = ['emg_reading', 'time']
 		writer = csv.DictWriter(emglog, fieldnames=fieldnames)
 		writer.writeheader()
+		# start timer
+		start = time.time()
+		time.clock() 
 		# collect and write data to the csv file
 		while True:
 			emg_val = emg.get_value()
-			writer.writerow({'emg_reading': emg_val})
+			elapsed = time.time() - start
+			writer.writerow({'emg_reading': emg_val, 'time': elapsed})
 
-def collect_vitals(vitals):
+def collect_vitals(vitals, tester):
 	"""
 	collect the data from the max30102 sensor and store it in a csv file
 	"""
+	tester += '_vitals.csv'
 	# open the emg log (csv format) to start data collection
-	with open('vitals.csv', 'a') as vitalslog:
+	with open(tester, mode='a') as vitalslog:
 		# set the column headers
-		fieldnames = ['hr', 'hr_valid', 'spo2', 'spo2_valid',]
+		fieldnames = ['hr', 'hr_valid', 'spo2', 'spo2_valid', 'time']
 		writer = csv.DictWriter(emglog, fieldnames=fieldnames)
 		writer.writeheader()
 		# collect and write data to the csv file
+		# start timer
+		start = time.time()
+		time.clock() 
 		while True:
 			# collect raw readings
 			red, ir = vitals.read_sequential(amount=100)
+			elapsed = time.time() - start
 			# process the readings: EXPERIMENTAL 
 			hr, hr_valid, spo2, spo2_valid = hrcalc.calc_hr_and_spo2(ir, red)
-			writer.writerow({'hr': hr, 'hr_valid': hr_valid, 'spo2': spo2, 'spo2_valid': spo2_valid})
+			writer.writerow({'hr': hr, 'hr_valid': hr_valid, 'spo2': spo2, 'spo2_valid': spo2_valid, 'time': elapsed})
 
 
 # collect the sensor data in parallel 
@@ -60,6 +72,6 @@ def start_peripherals(*funcs):
 
 if __name__ == '__main__':
 	# construct the EMG and MAX30102
-	emg, vitals = setup()
+	emg, vitals, tester = setup()
 	# run the data collection in parallel
-	start_peripherals(collect_emg(emg), collect_vitals(vitals))
+	start_peripherals(collect_emg(emg, tester), collect_vitals(vitals, tester))
