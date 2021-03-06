@@ -2,6 +2,7 @@ import numpy as np
 import scipy as sp
 from scipy import signal
 import os
+import csv
 
 def read_csv_data(emg_csv):
 	"""
@@ -10,7 +11,7 @@ def read_csv_data(emg_csv):
 	with open(emg_csv) as emg_file:
 		# read the emg data into numpy arrays
 		emg_data = np.array([row['emg_reading'] for row in DictReader(emg_file)])
-		emg_time = np.array([row['time'] for row in DictReader(emg_file)])
+		# emg_time = np.array([row['time'] for row in DictReader(emg_file)])
 	# correct the mean of the reading: centers the waves at 0 volts without changing amplitude or frequency
 	emg_data = emg_data - np.mean(emg_data)
 	return emg_data
@@ -28,6 +29,7 @@ def filter_data(emg_data, high_band=20, low_band=450, sampling_frequency=1000,):
 	emg_filtered = sp.signal.filtfilt(b, a, emg_data)
 	# rectiy the filtered data
 	emg = abs(emg_filtered)
+	return emg
 
 def get_dir():
 	"""

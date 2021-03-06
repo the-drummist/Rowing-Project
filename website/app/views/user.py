@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, redirect, url_for, request, session
+from flask import Blueprint, render_template, redirect, url_for, request, session, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.models import db, User
 from app.data_analysis import Data
-from app.helpers import login_required, generate_key
+from app.helper import login_required, generate_key
 
 user = Blueprint(name = 'user', import_name = __name__, static_folder = '/app/static', template_folder = '/app/templates')
 
@@ -105,13 +105,20 @@ def dashboard(username):
 @user.route('/account/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
-	pass
+	if request.method == 'POST':
+		return 'under construction, try again soon'
+	if request.method == 'GET':
+		return 'under construction, try again soon'
 
 @user.route('/account/upload', methods=['GET', 'POST'])
 @login_required
 def upload():
-	pass
+	if request.method == 'POST':
+		return 'under construction, try again soon'
+	if request.method == 'GET':
+		return 'under construction, try again soon'
+
 
 @user.route('/upload/<username>', methods=['POST'])
 def autoUpload(username):
-	pass
+	return

@@ -7,7 +7,7 @@ import RPi.GPIO as GPIO
 import smbus
 import board
 import adafruit_mcp3xxx.mcp3008 as MCP
-import adafruit_mcp3xxx.analogIn
+from adafruit_mcp3xxx.analogIn import AnalogIn
 import digitalio
 import busio
 
@@ -21,8 +21,8 @@ class EMG:
 		#GPIO.setmode(GPIO.BOARD)
 		#GPIO.setup(self.pin, GPIO.IN)
 		# create filter params (high-pass and low-pass)
-		high = high_band / (sampling_frequency / 2)
-		low = low_band / (sampling_frequency / 2)
+		high = 20 / (1000 / 2)
+		low = 450 / (1000 / 2)
 		# create butterworth filter: returns filter coefficients
 		self.b, self.a = sp.signal.butter(4, [high, low], btype='bandpass')
 		spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
@@ -43,16 +43,17 @@ class EMG:
 	def read_sequential(self, amount=100):
 		emg_buf = []
 		for i in range(amount):
-			emg_buf.append(get_raw())
+			emg_buf.append(self.get_raw())
 		return np.array(emg_buf)
 
 	def get_normalized(self):
-		buf = read_sequential()
+		buf = self.read_sequential()
 
 		# filter data (linear filter)
-		emg_filtered = sp.signal.filtfilt(self.b, self.a, emg_data)
+		emg_filtered = sp.signal.filtfilt(self.b, self.a, buf)
 		# rectiy the filtered data
 		emg = abs(emg_filtered) / BASELINE
+		return emg
 
 
 

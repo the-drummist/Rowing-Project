@@ -4,10 +4,10 @@ from datetime import datetime
 class Rowinguard:
 
 	def __init__(self):
-		self.emg_file = generate_name('emg')
-		self.vitals_file = generate_name('vitals')
+		self.emg_file = self.generate_name('emg')
+		self.vitals_file = self.generate_name('vitals')
 
-	def generate_name(dataform):
+	def generate_name(self, dataform):
 		if dataform == 'emg' or dataform == 'vitals':
 			date = datetime.now().strftime('_%Y_%m_%d-%I_%M_%S_%p')
 			filename = dataform + date + '.csv'

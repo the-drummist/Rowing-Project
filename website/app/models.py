@@ -9,7 +9,7 @@ class User(db.Model):
   hash = db.Column(db.String(92), nullable=False)
   birthday = db.Column(db.Date, nullable=True)
   weight = db.Column(db.Integer, nullable=True)
-  sex = db.column(db.String(6), nullable=True)
+  sex = db.Column(db.String(6), nullable=True)
   rhr = db.Column(db.Integer, nullable=True)
   upload_id = db.Column(db.Integer, nullable=False, unique=True)
 

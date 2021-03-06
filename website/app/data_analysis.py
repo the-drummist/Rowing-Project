@@ -31,13 +31,13 @@ class Data:
 		with open(vitalsfile, mode='r') as vitals:
 			# list comprehension to form the lists with ONLY valid data
 			self.hr_data = {
-				'y_values': [row['hr'] for row in DictReader(vitals) if row['hr_valid'] is True]
+				'y_values': [row['hr'] for row in DictReader(vitals) if row['hr_valid'] is True],
 				'x_values': [row['time'] for row in DictReader(vitals) if row['hr_valid'] is True]
 				}
 			self.spo2_data = {
-				'y_values': [row['spo2'] for row in DictReader(vitals) if row['spo2_valid'] is True]
+				'y_values': [row['spo2'] for row in DictReader(vitals) if row['spo2_valid'] is True],
 				'x_values': [row['time'] for row in DictReader(vitals) if row['spo2_valid'] is True]
-			}
+				}
 			self.hr_avg = hr_avg / len(hr)
 
 
@@ -158,12 +158,12 @@ class Data:
 		callable function to tie the class together
 		consider using multithreading if this takes too long
 		"""
-		calories = get_calories()
-		max_hr, min_hr = hr_range()
-		hr_plot = hr_graph(max_hr,min_hr)
-		spot_plot = spo2_graph()
-		emg_plot = emg_graph()
-		intensity_plot = intensity_graph()
+		calories = self.get_calories()
+		max_hr, min_hr = self.hr_range()
+		hr_plot = self.hr_graph(max_hr,min_hr)
+		spot_plot = self.spo2_graph()
+		emg_plot = self.emg_graph()
+		intensity_plot = self.intensity_graph()
 		#shear_plot = shear_load_graph()
 		# re add shear plot to the return statement when it is working!
 		return calories, file_html(column(hr_plot, spo2_plot, emg_plot, intensity_plot, sizing_mode='scale_width'))

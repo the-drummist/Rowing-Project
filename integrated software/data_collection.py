@@ -1,5 +1,6 @@
 # for version 1 of prototype
 from devices import MAX30102, EMG
+import hrcalc
 import csv
 from multiprocessing import Process
 import time
@@ -43,7 +44,7 @@ def collect_vitals(vitals, tester):
 	with open(tester, mode='a') as vitalslog:
 		# set the column headers
 		fieldnames = ['hr', 'hr_valid', 'spo2', 'spo2_valid', 'time']
-		writer = csv.DictWriter(emglog, fieldnames=fieldnames)
+		writer = csv.DictWriter(vitalslog, fieldnames=fieldnames)
 		writer.writeheader()
 		# collect and write data to the csv file
 		# start timer
@@ -72,6 +73,6 @@ def start_peripherals(*funcs):
 
 if __name__ == '__main__':
 	# construct the EMG and MAX30102
-	emg, vitals, tester = setup()
+	emg, vitals, tester = setup() # set pins here
 	# run the data collection in parallel
 	start_peripherals(collect_emg(emg, tester), collect_vitals(vitals, tester))
