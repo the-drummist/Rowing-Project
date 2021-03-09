@@ -33,6 +33,7 @@ def collect_emg(emg, tester):
 		while True:
 			emg_val = emg.get_raw()
 			elapsed = time.time() - start
+			print('emg: ', emg_val)
 			writer.writerow({'emg_reading': emg_val, 'time': elapsed})
 
 def collect_vitals(vitals, tester):
@@ -56,6 +57,7 @@ def collect_vitals(vitals, tester):
 			elapsed = time.time() - start
 			# process the readings: EXPERIMENTAL 
 			hr, hr_valid, spo2, spo2_valid = hrcalc.calc_hr_and_spo2(ir, red)
+			print('hr: ', hr, 'spo2', spo2)
 			writer.writerow({'hr': hr, 'hr_valid': hr_valid, 'spo2': spo2, 'spo2_valid': spo2_valid, 'time': elapsed})
 
 

@@ -5,9 +5,10 @@ import scipy as sp
 from scipy import signal
 import RPi.GPIO as GPIO
 import smbus
+
 import board
 import adafruit_mcp3xxx.mcp3008 as MCP
-from adafruit_mcp3xxx.analogIn import AnalogIn
+from adafruit_mcp3xxx.analog_in import AnalogIn
 import digitalio
 import busio
 
@@ -108,7 +109,7 @@ class MAX30102():
 		self.interrupt = gpio_pin
 
 		# set gpio mode
-		GPIO.setmode(GPIO.BOARD)
+		#GPIO.setmode(GPIO.BOARD)
 		GPIO.setup(self.interrupt, GPIO.IN)
 
 		self.reset()
