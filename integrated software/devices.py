@@ -6,17 +6,18 @@ from scipy import signal
 import RPi.GPIO as GPIO
 import smbus
 
-import board
-import adafruit_mcp3xxx.mcp3008 as MCP
-from adafruit_mcp3xxx.analog_in import AnalogIn
-import digitalio
-import busio
+import spidev
+#import board
+#import adafruit_mcp3xxx.mcp3008 as MCP
+#from adafruit_mcp3xxx.analog_in import AnalogIn
+#import digitalio
+#import busio
 
 # class for the EMG sensor
 BASELINE = None
 class EMG:
 	# construct the class with the connected pin
-	def __init__(self, pin=MCP.P0):
+	def __init__(self, pin=MCP.P0, channel=0):
 		#self.pin = pin
 		#GPIO.cleanup(self.pin)
 		#GPIO.setmode(GPIO.BOARD)
@@ -26,16 +27,28 @@ class EMG:
 		low = 450 / (1000 / 2)
 		# create butterworth filter: returns filter coefficients
 		self.b, self.a = sp.signal.butter(4, [high, low], btype='bandpass')
-		spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
-		cs = digitalio.DigitalInOut(board.D5)
-		mcp = MCP.MCP3008(spi, cs)
-		self.pin = AnalogIn(mcp, pin)
+		# create spi bus
+		#spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
+		# create chip select
+		#cs = digitalio.DigitalInOut(board.D5)
+		# create mcp object
+		#mcp = MCP.MCP3008(spi, cs)
+		# create input channel on pin
+		#self.channel = AnalogIn(mcp, pin)
+		self.spi = spidev.SpiDev()
+		self.spi.open(0, 0)
+		assert channel <= 7 and channel >=0
+		self.channel = channel
 
 	# calibrate the EMG
 	# this will only be necessary if different users get wildly different values 
 	def calibrate(self):
 		pass
 
+	def read_analog(self):
+		read = self.spi.xfer2([1, (8 + self.channel) << 4, 0])
+		data = ((read[1] & 3) << 8) + read[2]
+		return data
 	# get the current value from the EMG
 	def get_raw(self):
 		return self.pin.value
