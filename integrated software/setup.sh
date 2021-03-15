@@ -5,7 +5,7 @@ sudo apt-get upgrade
 sudo pip3 install --upgrade setuptools
 
 sudo pip3 install numpy
-sudo sudo apt-get install python3-scipy
+sudo apt-get install python3-scipy
 sudo pip3 install RPi.GPIO
 sudo pip3 install smbus # not sure if this will work
 sudo pip3 install adafruit-circuitpython-mcp3xxx
