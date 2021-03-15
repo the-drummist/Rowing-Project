@@ -8,5 +8,7 @@ class Config:
   
   	# database config
   	SQLALCHEMY_DATABASE_URI = "sqlite:///database.db"
+  	# production db uri
+  	# SQLALCHEMY_DATABASE_URI = 'postgres://qolduouvyfddse:95733d22eb98d763f799900278ca019d7ca99ba25b8e1bbbfd311e4fef65e47a@ec2-54-167-168-52.compute-1.amazonaws.com:5432/d5mhj6udvnh3cs'
   	SQLALCHEMY_ECHO = True
   	SQLALCHEMY_TRACK_MODIFICATIONS = False
