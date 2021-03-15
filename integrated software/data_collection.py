@@ -5,12 +5,12 @@ import csv
 from multiprocessing import Process
 import time
 
-def setup(emg_pin, pulse_pin):
+def setup(emg_channel=0, pulse_pin=7):
 	"""
 	setup the peripheral devices
 	"""
-	vitals = MAX30102(pulse_pin)
-	emg = EMG(emg_pin)
+	vitals = MAX30102(gpio_pin=pulse_pin)
+	emg = EMG(emg_channel)
 	tester = input('name of tester: ')
 	# emg.calibrate()
 	return emg, vitals, tester
@@ -31,7 +31,7 @@ def collect_emg(emg, tester):
 		time.clock() 
 		# collect and write data to the csv file
 		while True:
-			emg_val = emg.get_raw()
+			emg_val = emg.read_analog()
 			elapsed = time.time() - start
 			print('emg: ', emg_val)
 			writer.writerow({'emg_reading': emg_val, 'time': elapsed})
