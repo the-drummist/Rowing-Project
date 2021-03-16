@@ -5,7 +5,7 @@ import csv
 from multiprocessing import Process
 import time
 
-def setup(emg_channel=0, pulse_pin=7):
+def setup(emg_channel=0, pulse_pin=5):
 	"""
 	setup the peripheral devices
 	"""
