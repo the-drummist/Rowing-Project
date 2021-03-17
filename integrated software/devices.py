@@ -17,7 +17,7 @@ import spidev
 BASELINE = None
 class EMG:
 	# construct the class with the connected pin
-	def __init__(self, pin=MCP.P0, channel=0):
+	def __init__(self, channel=0):
 		#self.pin = pin
 		#GPIO.cleanup(self.pin)
 		#GPIO.setmode(GPIO.BOARD)
@@ -38,6 +38,7 @@ class EMG:
 		self.spi = spidev.SpiDev()
 		self.spi.open(0, 0)
 		assert channel <= 7 and channel >=0
+		self.spi.max_speed_hz = 1350000
 		self.channel = channel
 
 	# calibrate the EMG
