@@ -4,6 +4,7 @@ import hrcalc
 import csv
 from multiprocessing import Process
 import time
+from time import sleep
 
 def setup(emg_channel=0, pulse_pin=5):
 	"""
@@ -35,6 +36,7 @@ def collect_emg(emg, tester):
 			elapsed = time.time() - start
 			print('emg: ', emg_val)
 			writer.writerow({'emg_reading': emg_val, 'time': elapsed})
+			sleep(0.1)
 
 def collect_vitals(vitals, tester):
 	"""
