@@ -4,7 +4,7 @@ from app.models import db, User
 from app.data_analysis import Data
 from app.helper import login_required, generate_key
 
-user = Blueprint(name = 'user', import_name = __name__, static_folder = '/app/static', template_folder = '/app/templates')
+user = Blueprint(name = 'user', import_name = __name__, static_folder = '/app/static/user', template_folder = '/app/templates/user', url_prefix='/user/')
 
 ### SECTION: Session Related Routes ###
 @user.route('/register',methods=[ 'GET', 'POST'])
@@ -94,7 +94,6 @@ def logout():
 
 ### SECTION: Main Routes ###
 @user.route('/dashboard/<username>', methods=['GET'])
-@login_required
 def dashboard(username):
 	user = db.query.filter_by(session['user_id']).first()
 	username = user.username
