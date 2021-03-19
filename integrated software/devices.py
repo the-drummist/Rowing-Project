@@ -113,9 +113,9 @@ REG_PART_ID = 0xFF
 
 
 class MAX30102():
-	# by default, this assumes that physical pin 5 (GPIO 3) is used as interrupt
+	# by default, this assumes that physical pin 3 (GPIO 2) is used as interrupt
 	# by default, this assumes that the device is at 0x57 on channel 1
-	def __init__(self, channel=1, address=0x57, gpio_pin=5):
+	def __init__(self, channel=1, address=0x57, gpio_pin=3):
 		print("Channel: {0}, address: 0x{1:x}".format(channel, address))
 		self.address = address
 		self.channel = channel
