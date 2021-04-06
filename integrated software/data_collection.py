@@ -36,7 +36,7 @@ def collect_emg(emg, tester):
 			elapsed = time.time() - start
 			print('emg: ', emg_val)
 			writer.writerow({'emg_reading': emg_val, 'time': elapsed})
-			sleep(0.1)
+			sleep(0.5)
 
 def collect_vitals(vitals, tester):
 	"""
@@ -51,17 +51,17 @@ def collect_vitals(vitals, tester):
 		writer.writeheader()
 		# collect and write data to the csv file
 		# start timer
-		start = time.time()
-		time.clock() 
+		start = time.process_time()
+		#time.clock() 
 		while True:
 			# collect raw readings
 			red, ir = vitals.read_sequential(amount=100)
-			elapsed = time.time() - start
+			elapsed = time.process_time() - start
 			# process the readings: EXPERIMENTAL 
 			hr, hr_valid, spo2, spo2_valid = hrcalc.calc_hr_and_spo2(ir, red)
 			print('hr: ', hr, 'spo2', spo2)
 			writer.writerow({'hr': hr, 'hr_valid': hr_valid, 'spo2': spo2, 'spo2_valid': spo2_valid, 'time': elapsed})
-
+			sleep(0.5)
 
 # collect the sensor data in parallel 
 def start_peripherals(*funcs):
