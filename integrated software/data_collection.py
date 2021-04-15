@@ -79,10 +79,4 @@ if __name__ == '__main__':
 	# construct the EMG and MAX30102
 	emg, vitals, tester = setup() # set pins here
 	# run the data collection in parallel
-	# start_peripherals(collect_emg(emg, tester), collect_vitals(vitals, tester))
-	p1 = Process(target=collect_emg, args=(emg, tester))
-	p2 = Process(target=collect_vitals, args=(vitals, tester))
-	p1.start()
-	p2.start()
-	p1.join()
-	p2.join()
+	start_peripherals(collect_emg(emg, tester), collect_vitals(vitals, tester))
