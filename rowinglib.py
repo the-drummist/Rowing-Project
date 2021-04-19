@@ -2,13 +2,18 @@
 from datetime import datetime
 from multiprocessing import Process
 import RPi.GPIO as GPIO
+from time import sleep
 
 class Rowinguard:
 
-	def __init__(self, interupt):
+	def __init__(self, interupt, buzz):
 		self.emg_file = self.generate_name('emg')
 		self.vitals_file = self.generate_name('vitals')
 		self.interupt = interupt
+		GPIO.setup(buzz, GPIO.OUT)
+		GPIO.output(buzz, GPIO.LOW)
+		self.buzz = buzz
+
 		GPIO.setmode(GPIO.BOARD)
 
 
@@ -31,8 +36,17 @@ class Rowinguard:
 	return toJoin
 
 
-	def alert(self, type):
-
+	def alert(self, _type):
+		if _type == 'form':
+			GPIO.output(self.buzz, GPIO.HIGH)
+			sleep(1)
+			GPIO.output(self.buzz, GPIO.LOW)
+			sleep(1)
+		elif _type == 'fatigue':
+			GPIO.output(self.buzz, GPIO.HIGH)
+			sleep(.5)
+			GPIO.output(self.buzz, GPIO.LOW)
+			sleep(.5)
 
 	def start_workout(self):
 		# wait for interupt here

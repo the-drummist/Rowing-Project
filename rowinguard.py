@@ -55,7 +55,7 @@ def form_monitor(emg, rowinguard):
 	"""
 	checks if emg is consistantly reading higher than threshold
 	"""
-	THRESHOLD = 00000
+	THRESHOLD = 95 # percent... experimental
 	emg_list = []
 	for i in range(10):
 		emg_list.append(emg.read_analog())
@@ -74,21 +74,21 @@ def fatigue_monitor(emg, vitals, rowinguard):
 	"""
 	checks if emg and oxygen are reading lower than they should be
 	"""
-	THRESHOLD = slightly lower threshold than form form_monitor
-	SPO2_MAX = maximum value of bad oxygen levels
+	THRESHOLD = 90
+	SPO2_MAX = 75 # minimum IDEAL range for a workout is 85%
 	emg_list = []
 	spo2_list = []
 	for i in range(50)
-		spo2_list.append(emg.read_analog)
+		emg_list.append(emg.read_analog())
 		red, ir = vitals.read_sequential(amount=100)
 		hr, hr_valid, spo2, spo2_valid = hrcalc.calc_hr_and_spo2(ir, red)
 		if spo2_valid:
-			ox_list.append(spo2)
+			spo2_list.append(spo2)
 		delay(0.5)
 	while True:
 		avg_emg = sum(emg_list) / len(emg_list)
 		avg_spo2 = sum(spo2_list) / len(spo2_list)
-		if avg_emg >= THRESHOLD and avg_spo2 < SPO2_MAX:
+		if avg_emg >= THRESHOLD and avg_spo2 <= SPO2_MAX:
 			rowinguard.alert('fatigue')
 		del emg_list[0]
 		del spo2_list[0]
@@ -102,7 +102,7 @@ def fatigue_monitor(emg, vitals, rowinguard):
 #def error_detection(emg, vitals, rowinguard)
 
 if __name__ == '__main__':
-	rowinguard = Rowinguard()
+	rowinguard = Rowinguard(interrupt=,buz=)
 	emg, vitals = rowinguard.start_workout()
 	process_list = rowinguard.start_peripherals(collect_emg(emg, rowinguard.emg_file), 
 		collect_vitals(vitals, rowinguard.vitals_file), 

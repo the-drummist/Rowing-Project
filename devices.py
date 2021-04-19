@@ -39,6 +39,14 @@ class EMG:
 		read = self.spi.xfer2([1, (8 + self.channel) << 4, 0])
 		data = ((read[1] & 3) << 8) + read[2]
 		return data
+
+	def read_percent(self):
+		"""
+		returns a emg as a percentage of the maximum acceptable range
+		"""
+		_MAX = TODO!!
+		return (self.read_analog() / _MAX) * 100
+	"""
 	# get the current value from the EMG
 	def get_raw(self):
 		return self.pin.value
@@ -58,6 +66,7 @@ class EMG:
 		# rectiy the filtered data
 		emg = abs(emg_filtered) / BASELINE
 		return emg
+	"""
 
 
 
