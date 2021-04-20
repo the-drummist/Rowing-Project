@@ -5,7 +5,7 @@ import scipy as sp
 from scipy import signal
 import RPi.GPIO as GPIO
 import smbus
-
+import logging
 import spidev
 #import board
 #import adafruit_mcp3xxx.mcp3008 as MCP
@@ -18,6 +18,12 @@ BASELINE = None
 class EMG:
 	# construct the class with the connected pin
 	def __init__(self, channel=0):
+		logger = logging.getLogger('EMG')
+		ch = logging.StreamHandler()
+		formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
+		ch.setFormatter(formatter)
+		logger.addHandler(ch)
+		self.logger = logger
 		# create filter params (high-pass and low-pass)
 		high = 20 / (1000 / 2)
 		low = 450 / (1000 / 2)
@@ -26,9 +32,10 @@ class EMG:
 		# create spi bus
 		self.spi = spidev.SpiDev()
 		self.spi.open(0, 0)
-		assert channel <= 7 and channel >=0
+		assert channel <= 7 and channel >=0, self.logger.critical('EMG channel not within bounds')
 		self.spi.max_speed_hz = 1350000
 		self.channel = channel
+		self.logger.info(f'EMG initialized on channel {channel} at {self.spi.max_speed_hz}hz')
 
 	# calibrate the EMG
 	# this will only be necessary if different users get wildly different values 
@@ -114,7 +121,14 @@ class MAX30102():
 	# by default, this assumes that physical pin 3 (GPIO 2) is used as interrupt
 	# by default, this assumes that the device is at 0x57 on channel 1
 	def __init__(self, channel=1, address=0x57, gpio_pin=3):
-		print("Channel: {0}, address: 0x{1:x}".format(channel, address))
+		logger = logging.getLogger('MAX30102')
+		ch = logging.StreamHandler()
+		formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
+		ch.setFormatter(formatter)
+		logger.addHandler(ch)
+		self.logger = logger
+
+		self.logger.info('Channel: {0}, address: 0x{1:x}'.format(channel, address))
 		self.address = address
 		self.channel = channel
 		self.bus = smbus.SMBus(self.channel)
@@ -122,18 +136,27 @@ class MAX30102():
 
 		# set gpio mode
 		GPIO.setmode(GPIO.BOARD)
-		GPIO.setup(self.interrupt, GPIO.IN)
-
-		self.reset()
+		try:
+			GPIO.setup(self.interrupt, GPIO.IN)
+		except:
+			self.logger.critical('GPIO setup failed', exc_info=True)
+		try:
+			self.reset()
+		except:
+			self.logger.critical('internal reset method failed', exc_info=True)
 
 		sleep(1)  # wait 1 sec
 
 		# read & clear interrupt register (read 1 byte)
 		reg_data = self.bus.read_i2c_block_data(self.address, REG_INTR_STATUS_1, 1)
 		# print("[SETUP] reset complete with interrupt register0: {0}".format(reg_data))
-		self.setup()
+		try:
+			self.setup()
+		except:
+			self.logger.critical('internal setup function failed', exc_info=True)
 		# print("[SETUP] setup complete")
-
+		self.logger.info('initialized successfully')
+		
 	def shutdown(self):
 		"""
 		Shutdown the device.

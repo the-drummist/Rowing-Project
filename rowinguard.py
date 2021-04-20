@@ -4,9 +4,9 @@ from rowinglib import Rowinguard
 import csv
 import time
 from time import sleep
+import logging
 
-
-def collect_emg(emg, filename):
+def collect_emg(emg, filename, logger):
 	"""
 	collect the data from the emg sensor and store it in a csv file
 	"""
@@ -16,18 +16,18 @@ def collect_emg(emg, filename):
 		fieldnames = ['emg_reading', 'time']
 		writer = csv.DictWriter(emglog, fieldnames=fieldnames)
 		writer.writeheader()
+		logger.debug('starting collect_emg()')
 		# start timer
-		start = time.time()
-		time.clock() 
+		start = time.process_time()
 		# collect and write data to the csv file
 		while True:
 			emg_val = emg.read_analog()
-			elapsed = time.time() - start
+			elapsed = time.process_time() - start
 			print('emg: ', emg_val)
 			writer.writerow({'emg_reading': emg_val, 'time': elapsed})
 			sleep(0.5)
 
-def collect_vitals(vitals, filename):
+def collect_vitals(vitals, filename, logger):
 	"""
 	collect the data from the max30102 sensor and store it in a csv file
 	"""
@@ -37,6 +37,7 @@ def collect_vitals(vitals, filename):
 		fieldnames = ['hr', 'hr_valid', 'spo2', 'spo2_valid', 'time']
 		writer = csv.DictWriter(vitalslog, fieldnames=fieldnames)
 		writer.writeheader()
+		logger.debug('starting collect_vitals()')
 		# collect and write data to the csv file
 		# start timer
 		start = time.process_time()
@@ -51,11 +52,12 @@ def collect_vitals(vitals, filename):
 			writer.writerow({'hr': hr, 'hr_valid': hr_valid, 'spo2': spo2, 'spo2_valid': spo2_valid, 'time': elapsed})
 			sleep(0.5)
 
-def form_monitor(emg, rowinguard):
+def form_monitor(emg, rowinguard, logger):
 	"""
 	checks if emg is consistantly reading higher than threshold
 	"""
 	THRESHOLD = 95 # percent... experimental
+	logger.debug(f'starting form_monitor() with theshold of {THRESHOLD}%')
 	emg_list = []
 	for i in range(10):
 		emg_list.append(emg.read_analog())
@@ -70,12 +72,13 @@ def form_monitor(emg, rowinguard):
 
 
 
-def fatigue_monitor(emg, vitals, rowinguard):
+def fatigue_monitor(emg, vitals, rowinguard, logger):
 	"""
 	checks if emg and oxygen are reading lower than they should be
 	"""
 	THRESHOLD = 90
 	SPO2_MAX = 75 # minimum IDEAL range for a workout is 85%
+	logger.debug(f'starting fatigue_monitor() with EMG threshold of {THRESHOLD}% and SpO2 threshold of {SPO2_MAX}%')
 	emg_list = []
 	spo2_list = []
 	for i in range(50)
@@ -101,15 +104,31 @@ def fatigue_monitor(emg, vitals, rowinguard):
 
 #def error_detection(emg, vitals, rowinguard)
 
+def log_init():
+	logger = logging.getLogger('ROWINGUARD')
+	ch = logging.StreamHandler()
+	formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
+	ch.setFormatter(formatter)
+	logger.addHandler(ch)
+	return logger
+
 if __name__ == '__main__':
-	rowinguard = Rowinguard(interrupt=,buz=)
+	logger = log_init()
+	logger.info('Program Started')
+	logger.info('Waiting for interrupt to continue')
+	rowinguard = Rowinguard(interrupt=11,buz=13) # GPIO 17 and 27 respectivly 
+	logger.info('Rowinguard instance created')
+	logger.info('initializing EMG and Pulse Oximeter')
 	emg, vitals = rowinguard.start_workout()
-	process_list = rowinguard.start_peripherals(collect_emg(emg, rowinguard.emg_file), 
-		collect_vitals(vitals, rowinguard.vitals_file), 
-		form_monitor(emg, rowinguard), 
-		fatigue_monitor(emg, vitals, rowinguard), 
-		error_detection(emg, vitals, rowinguard))
+	logger.info('starting all threads')
+	process_list = rowinguard.start_peripherals(collect_emg(emg, rowinguard.emg_file, logger), 
+		collect_vitals(vitals, rowinguard.vitals_file, logger), 
+		form_monitor(emg, rowinguard, logger), 
+		fatigue_monitor(emg, vitals, rowinguard, logger))
+	logger.info('parent thread waiting for interrupt to terminate the program')
 	rowinguard.wait()
 	for process in process_list:
 		process.terminate()
+	logger.info('all threads terminated')
+	logger.info('goodbye')
 	exit(0)
