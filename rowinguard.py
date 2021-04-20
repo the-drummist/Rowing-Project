@@ -122,7 +122,7 @@ if __name__ == '__main__':
 		collect_vitals(vitals, rowinguard.vitals_file, logger), 
 		form_monitor(emg, rowinguard, logger), 
 		fatigue_monitor(emg, vitals, rowinguard, logger))
-	logger.info('parent thread waiting for interrupt to terminate the program')
+	logger.info('main thread waiting for interrupt to terminate the program')
 	rowinguard.wait()
 	for process in process_list:
 		process.terminate()
