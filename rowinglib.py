@@ -8,11 +8,8 @@ import logging
 class Rowinguard:
 
 	def __init__(self, interupt, buzz):
+		logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
 		logger = logging.getLogger('ROWINGLIB')
-		ch = logging.StreamHandler()
-		formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
-		ch.setFormatter(formatter)
-		logger.addHandler(ch)
 		self.logger = logger
 		self.emg_file = self.generate_name('emg')
 		self.vitals_file = self.generate_name('vitals')

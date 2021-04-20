@@ -18,11 +18,8 @@ BASELINE = None
 class EMG:
 	# construct the class with the connected pin
 	def __init__(self, channel=0):
+		logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
 		logger = logging.getLogger('EMG')
-		ch = logging.StreamHandler()
-		formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
-		ch.setFormatter(formatter)
-		logger.addHandler(ch)
 		self.logger = logger
 		# create filter params (high-pass and low-pass)
 		high = 20 / (1000 / 2)
@@ -32,7 +29,7 @@ class EMG:
 		# create spi bus
 		self.spi = spidev.SpiDev()
 		self.spi.open(0, 0)
-		assert channel <= 7 and channel >=0, self.logger.critical('EMG channel not within bounds')
+		assert channel <= 7 and channel >=0, 'EMG channel not within bounds'
 		self.spi.max_speed_hz = 1350000
 		self.channel = channel
 		self.logger.info(f'EMG initialized on channel {channel} at {self.spi.max_speed_hz}hz')
@@ -121,11 +118,8 @@ class MAX30102():
 	# by default, this assumes that physical pin 3 (GPIO 2) is used as interrupt
 	# by default, this assumes that the device is at 0x57 on channel 1
 	def __init__(self, channel=1, address=0x57, gpio_pin=3):
+		logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
 		logger = logging.getLogger('MAX30102')
-		ch = logging.StreamHandler()
-		formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
-		ch.setFormatter(formatter)
-		logger.addHandler(ch)
 		self.logger = logger
 
 		self.logger.info('Channel: {0}, address: 0x{1:x}'.format(channel, address))

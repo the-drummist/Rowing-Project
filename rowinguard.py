@@ -105,11 +105,8 @@ def fatigue_monitor(emg, vitals, rowinguard, logger):
 #def error_detection(emg, vitals, rowinguard)
 
 def log_init():
+	logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
 	logger = logging.getLogger('ROWINGUARD')
-	ch = logging.StreamHandler()
-	formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
-	ch.setFormatter(formatter)
-	logger.addHandler(ch)
 	return logger
 
 if __name__ == '__main__':
