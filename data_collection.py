@@ -5,12 +5,12 @@ import csv
 from multiprocessing import Process
 import time
 from time import sleep
-
-def setup(emg_channel=0, pulse_pin=3):
+import atexit
+def setup(emg_channel=0):
 	"""
 	setup the peripheral devices
 	"""
-	vitals = MAX30102(gpio_pin=pulse_pin)
+	vitals = MAX30102()
 	emg = EMG(emg_channel)
 	tester = input('name of tester: ')
 	# emg.calibrate()
@@ -22,18 +22,18 @@ def collect_emg(emg, tester):
 	"""
 	tester += '_emg.csv'
 	# open the emg log (csv format) to start data collection
-	with open(tester, mode='a') as emglog:
+	with open(tester, mode='w') as emglog:
 		# set the column header
 		fieldnames = ['emg_reading', 'time']
 		writer = csv.DictWriter(emglog, fieldnames=fieldnames)
 		writer.writeheader()
 		# start timer
-		start = time.time()
+		start = time.process_time()
 		time.clock() 
 		# collect and write data to the csv file
 		while True:
 			emg_val = emg.read_analog()
-			elapsed = time.time() - start
+			elapsed = time.process_time() - start
 			print('emg: ', emg_val)
 			writer.writerow({'emg_reading': emg_val, 'time': elapsed})
 			sleep(0.5)
@@ -44,7 +44,7 @@ def collect_vitals(vitals, tester):
 	"""
 	tester += '_vitals.csv'
 	# open the emg log (csv format) to start data collection
-	with open(tester, mode='a') as vitalslog:
+	with open(tester, mode='w') as vitalslog:
 		# set the column headers
 		fieldnames = ['hr', 'hr_valid', 'spo2', 'spo2_valid', 'time']
 		writer = csv.DictWriter(vitalslog, fieldnames=fieldnames)
@@ -61,7 +61,7 @@ def collect_vitals(vitals, tester):
 			hr, hr_valid, spo2, spo2_valid = hrcalc.calc_hr_and_spo2(ir, red)
 			print('hr: ', hr, 'spo2', spo2)
 			writer.writerow({'hr': hr, 'hr_valid': hr_valid, 'spo2': spo2, 'spo2_valid': spo2_valid, 'time': elapsed})
-			sleep(0.5)
+			sleep(0.1)
 
 # collect the sensor data in parallel 
 def start_peripherals(*funcs):
@@ -77,6 +77,8 @@ def start_peripherals(*funcs):
 
 if __name__ == '__main__':
 	# construct the EMG and MAX30102
-	emg, vitals, tester = setup() # set pins here
+	emg, vitals, tester = setup() 
+	atexit.register(vitals.shutdown())
 	# run the data collection in parallel
 	start_peripherals(collect_emg(emg, tester), collect_vitals(vitals, tester))
+	vitals.shutdown()

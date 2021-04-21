@@ -63,7 +63,7 @@ class Rowinguard:
 		GPIO.wait_for_edge(self.interupt, GPIO.RISING)
 		self.logger.info('rising edge detected')
 		emg = EMG(0)
-		vitals = MAX30102(3)
+		vitals = MAX30102()
 		return emg, vitals
 
 	def end_workout(self):
