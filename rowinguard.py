@@ -118,7 +118,7 @@ if __name__ == '__main__':
 	logger.info('Rowinguard instance created')
 	logger.info('initializing EMG and Pulse Oximeter')
 	emg, vitals = rowinguard.start_workout()
-	atexit.register(vitals.shutdown())
+	atexit.register(vitals.shutdown)
 	logger.info('starting all threads')
 	process_list = rowinguard.start_peripherals(collect_emg(emg, rowinguard.emg_file, logger), 
 		collect_vitals(vitals, rowinguard.vitals_file, logger), 

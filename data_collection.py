@@ -59,7 +59,7 @@ def collect_vitals(vitals, tester):
 			elapsed = time.process_time() - start
 			# process the readings: EXPERIMENTAL 
 			hr, hr_valid, spo2, spo2_valid = hrcalc.calc_hr_and_spo2(ir, red)
-			print('hr: ', hr, 'spo2', spo2)
+			print('hr: ', hr, 'spo2: ', spo2)
 			writer.writerow({'hr': hr, 'hr_valid': hr_valid, 'spo2': spo2, 'spo2_valid': spo2_valid, 'time': elapsed})
 			sleep(0.1)
 
@@ -78,7 +78,7 @@ def start_peripherals(*funcs):
 if __name__ == '__main__':
 	# construct the EMG and MAX30102
 	emg, vitals, tester = setup() 
-	atexit.register(vitals.shutdown())
+	atexit.register(vitals.shutdown)
 	# run the data collection in parallel
 	start_peripherals(collect_emg(emg, tester), collect_vitals(vitals, tester))
 	vitals.shutdown()

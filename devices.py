@@ -133,8 +133,10 @@ class MAX30102():
 		Shutdown the device.
 		"""
 		self.logger.info('shutting down')
-		self.bus.write_i2c_block_data(self.address, REG_MODE_CONFIG, [0x80])
-
+		try:
+			self.bus.write_i2c_block_data(self.address, REG_MODE_CONFIG, [0x80])
+		except:
+			self.logger.critical('failed to shutdown')
 
 	def reset(self):
 		"""
@@ -185,8 +187,11 @@ class MAX30102():
 		self.bus.write_i2c_block_data(self.address, reg, value)
 
 	def get_data_present(self):
-		read_ptr = self.bus.read_byte_data(self.address, REG_FIFO_RD_PTR)
-		write_ptr = self.bus.read_byte_data(self.address, REG_FIFO_WR_PTR)
+		try:
+			read_ptr = self.bus.read_byte_data(self.address, REG_FIFO_RD_PTR)
+			write_ptr = self.bus.read_byte_data(self.address, REG_FIFO_WR_PTR)
+		except:
+			self.logger.critical('failed to retrieve data to determine if real data is present', exc_info=True)
 		if read_ptr == write_ptr:
 			return 0
 		else:
