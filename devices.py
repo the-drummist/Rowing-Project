@@ -49,8 +49,8 @@ class EMG:
 		"""
 		returns a emg as a percentage of the maximum acceptable range
 		"""
-		_MAX = TODO!!
-		return (self.read_analog() / _MAX) * 100
+		MAX = 600
+		return (self.read_analog() / 600) * 100
 	"""
 	# get the current value from the EMG
 	def get_raw(self):

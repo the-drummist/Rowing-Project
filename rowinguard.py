@@ -22,7 +22,7 @@ def collect_emg(emg, filename, logger):
 		start = time.process_time()
 		# collect and write data to the csv file
 		while True:
-			emg_val = emg.read_analog()
+			emg_val = emg.read_percent()
 			elapsed = time.process_time() - start
 			print('emg: ', emg_val)
 			writer.writerow({'emg_reading': emg_val, 'time': elapsed})
@@ -61,14 +61,14 @@ def form_monitor(emg, rowinguard, logger):
 	logger.debug(f'starting form_monitor() with theshold of {THRESHOLD}%')
 	emg_list = []
 	for i in range(10):
-		emg_list.append(emg.read_analog())
+		emg_list.append(emg.read_percent())
 		delay(0.3)
 	while True:
 		avg = sum(emg_list) / len(emg_list)
 		if avg >= THRESHOLD:
 			rowinguard.alert('form')
 		del emg_list[0]
-		emg_list.append(emg.read_analog())
+		emg_list.append(emg.read_percent())
 		delay(0.25)
 
 
@@ -83,7 +83,7 @@ def fatigue_monitor(emg, vitals, rowinguard, logger):
 	emg_list = []
 	spo2_list = []
 	for i in range(50)
-		emg_list.append(emg.read_analog())
+		emg_list.append(emg.read_percent())
 		red, ir = vitals.read_sequential(amount=100)
 		hr, hr_valid, spo2, spo2_valid = hrcalc.calc_hr_and_spo2(ir, red)
 		if spo2_valid:
@@ -96,7 +96,7 @@ def fatigue_monitor(emg, vitals, rowinguard, logger):
 			rowinguard.alert('fatigue')
 		del emg_list[0]
 		del spo2_list[0]
-		emg_list.append(emg.read_analog())
+		emg_list.append(emg.read_percent())
 		red, ir = vitals.read_sequential(amount=100)
 		hr, hr_valid, spo2, spo2_valid = hrcalc.calc_hr_and_spo2(ir, red)
 		if spo2_valid:
