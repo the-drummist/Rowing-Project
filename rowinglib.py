@@ -34,7 +34,7 @@ class Rowinguard:
 		processes = list()
 		# create a process for each target function and start it
 		for arg in args:
-			process = Process(target=arg[0], args=args[1])
+			process = Process(target=arg[0], args=arg[1])
 			process.start()
 			processes.append(process)
 		# join the processes
@@ -43,17 +43,18 @@ class Rowinguard:
 
 
 	def alert(self, _type):
+		buzzer = GPIO.PWM(self.buzz, 1000)
 		if _type == 'form':
 			self.logger.debug('starting form alert')
-			GPIO.output(self.buzz,	GPIO.HIGH)
+			buzzer.start(2)
 			sleep(1)
-			GPIO.output(self.buzz,	GPIO.LOW)
+			buzzer.stop()
 			sleep(1)
 		elif _type == 'fatigue':
 			self.logger.debug('starting fatigue alert')
-			GPIO.output(self.buzz,	GPIO.HIGH)
+			buzzer.start(2)
 			sleep(.5)
-			GPIO.output(self.buzz,	GPIO.LOW)
+			buzzer.stop()
 			sleep(.5)
 		else:
 			self.logger.warning('invalid alert type')
