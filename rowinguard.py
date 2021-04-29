@@ -6,6 +6,7 @@ import time
 from time import sleep
 import logging
 import atexit
+import os
 
 def collect_emg(emg, filename, logger):
 	"""
@@ -110,6 +111,15 @@ def log_init():
 	logger = logging.getLogger('ROWINGUARD')
 	return logger
 
+def restart(vitals, logger, process_list):
+	logger.info('restarting')
+	vitals.shutdown()
+	for process in process_list:
+		process.terminate()
+	os.system('python rowinguard.py')
+
+
+
 if __name__ == '__main__':
 	logger = log_init()
 	logger.info('Program Started')
@@ -118,16 +128,17 @@ if __name__ == '__main__':
 	logger.info('Rowinguard instance created')
 	logger.info('initializing EMG and Pulse Oximeter')
 	emg, vitals = rowinguard.start_workout()
-	atexit.register(vitals.shutdown)
 	logger.info('starting all threads')
 	process_list = rowinguard.start_peripherals(collect_emg(emg, rowinguard.emg_file, logger), 
 		collect_vitals(vitals, rowinguard.vitals_file, logger), 
 		form_monitor(emg, rowinguard, logger), 
 		fatigue_monitor(emg, vitals, rowinguard, logger))
+	atexit.register(restart, logger=logger, vitals=vitals, process_list=process_list)
 	logger.info('main thread waiting for interrupt to terminate the program')
 	rowinguard.wait()
 	for process in process_list:
 		process.terminate()
 	logger.info('all threads terminated')
 	logger.info('goodbye')
+
 	exit(0)
