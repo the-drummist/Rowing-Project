@@ -30,10 +30,10 @@ class EMG:
 		# create spi bus
 		self.spi = spidev.SpiDev()
 		self.spi.open(0, 0)
-		assert channel <= 7 and channel >=0, 'EMG channel not within bounds'
+		assert channel <= 7 and channel >=0, 'channel not within bounds'
 		self.spi.max_speed_hz = 1350000
 		self.channel = channel
-		self.logger.info(f'EMG initialized on channel {channel} at {self.spi.max_speed_hz}hz')
+		self.logger.info(f'initialized on channel {channel} at {self.spi.max_speed_hz}hz')
 
 	# calibrate the EMG
 	# this will only be necessary if different users get wildly different values 
