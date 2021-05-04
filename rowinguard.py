@@ -19,11 +19,11 @@ def collect_emg(emg, filename, logger):
 		writer.writeheader()
 		logger.debug('starting collect_emg()')
 		# start timer
-		start = time.process_time()
+		start = time.time()
 		# collect and write data to the csv file
 		while True:
 			emg_val = emg.read_percent()
-			elapsed = time.process_time() - start
+			elapsed = time.time() - start
 			print('emg: ', emg_val)
 			writer.writerow({'emg_reading': emg_val, 'time': elapsed})
 			sleep(0.5)
@@ -41,11 +41,11 @@ def collect_vitals(vitals, filename, logger):
 		logger.debug('starting collect_vitals()')
 		# collect and write data to the csv file
 		# start timer
-		start = time.process_time() 
+		start = time.time() 
 		while True:
 			# collect raw readings
 			red, ir = vitals.read_sequential(amount=100)
-			elapsed = time.process_time() - start
+			elapsed = time.time() - start
 			# process the readings: EXPERIMENTAL 
 			hr, hr_valid, spo2, spo2_valid = hrcalc.calc_hr_and_spo2(ir, red)
 			# print('hr: ', hr, 'spo2', spo2)
